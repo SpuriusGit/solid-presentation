@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solid.js + SolidStart</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/moon.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css" />
+  <style>
+    :root {
+      --solid-blue: #2c4f7c;
+      --solid-teal: #446b9e;
+      --solid-light: #4f88c6;
+      --solid-accent: #76b3e1;
+      --react-color: #61dafb;
+      --ok: #4ade80;
+      --warn: #fb923c;
+      --err: #f87171;
+    }
+
+    .reveal { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .reveal h1 { font-size: 2.2em; color: var(--solid-accent); }
+    .reveal h2 { font-size: 1.5em; color: var(--solid-accent); border-bottom: 2px solid var(--solid-teal); padding-bottom: .2em; }
+    .reveal h3 { font-size: 1.15em; color: #aed6f1; }
+    .reveal pre { width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,.5); border-radius: 8px; }
+    .reveal pre code { max-height: 420px; font-size: .72em; line-height: 1.5; }
+    .reveal code { background: rgba(255,255,255,.08); padding: .1em .35em; border-radius: 4px; font-size: .88em; }
+    .reveal ul { list-style: none; padding: 0; }
+    .reveal ul li::before { content: "▸ "; color: var(--solid-accent); }
+    .reveal ul li { margin: .4em 0; }
+    .reveal .slides section { text-align: left; }
+    .reveal .slides section.center-slide { text-align: center; }
+
+    /* layout helpers */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; align-items: start; }
+    .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1em; align-items: start; }
+    .box { background: rgba(255,255,255,.06); border-radius: 10px; padding: .8em 1em; }
+    .box.blue { border-left: 4px solid var(--solid-light); }
+    .box.orange { border-left: 4px solid var(--warn); }
+    .box.green { border-left: 4px solid var(--ok); }
+    .box.red { border-left: 4px solid var(--err); }
+
+    .tag { display: inline-block; padding: .15em .55em; border-radius: 4px; font-size: .72em; font-weight: 700; margin-right: .3em; }
+    .tag.ok  { background: var(--ok);   color: #000; }
+    .tag.bad { background: var(--err);  color: #000; }
+    .tag.tip { background: var(--warn); color: #000; }
+
+    /* graph */
+    .graph-wrap { display: flex; justify-content: center; margin: .8em 0; }
+    svg text { font-family: monospace; }
+
+    /* table */
+    table { width: 100%; border-collapse: collapse; font-size: .78em; }
+    th { background: var(--solid-blue); padding: .5em .8em; text-align: left; }
+    td { padding: .45em .8em; border-bottom: 1px solid rgba(255,255,255,.08); }
+    tr:nth-child(even) td { background: rgba(255,255,255,.04); }
+
+    /* title slide */
+    .title-logo { font-size: 5em; }
+    .subtitle { color: var(--solid-accent); font-size: 1.1em; margin-top: .5em; }
+    .meta { color: #aaa; font-size: .75em; margin-top: 2em; }
+
+    /* pitfall list */
+    .pitfall { display: flex; align-items: flex-start; gap: .6em; margin: .5em 0; font-size: .82em; }
+    .pitfall .icon { font-size: 1.3em; flex-shrink: 0; line-height: 1.3; }
+
+    /* benchmark bar */
+    .bench { margin: .4em 0; }
+    .bench-label { font-size: .78em; display: flex; justify-content: space-between; margin-bottom: .15em; }
+    .bench-bar-wrap { background: rgba(255,255,255,.1); border-radius: 4px; height: 18px; overflow: hidden; }
+    .bench-bar { height: 100%; border-radius: 4px; }
+
+    .fragment.highlight-current-blue.visible { color: var(--solid-accent); }
+
+    /* comparison badges */
+    .yes { color: var(--ok); font-weight: 700; }
+    .no  { color: var(--err); font-weight: 700; }
+
+    /* section divider */
+    .section-divider { background: linear-gradient(135deg, #1a2a4a 0%, #0d1b2e 100%); }
+    .section-divider h2 { border: none; font-size: 2em; text-align: center; }
+    .section-divider p { text-align: center; color: #aaa; }
+  </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 1 — TITLE
+══════════════════════════════════════════════ -->
+<section class="center-slide" data-background="linear-gradient(135deg,#0d1b2e 0%,#1a2a4a 100%)">
+  <div class="title-logo">⬡</div>
+  <h1>Solid.js + SolidStart</h1>
+  <p class="subtitle">Гайд для React-розробника</p>
+  <p class="meta">Fine-grained reactivity · No Virtual DOM · ~7 KB runtime</p>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 2 — WHY SOLID
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Чому Solid?</h2>
+  <div class="cols">
+    <div>
+      <h3>Продуктивність</h3>
+      <div class="bench">
+        <div class="bench-label"><span>Solid</span><span>🏆 топ-3</span></div>
+        <div class="bench-bar-wrap"><div class="bench-bar" style="width:96%;background:var(--solid-accent)"></div></div>
+      </div>
+      <div class="bench">
+        <div class="bench-label"><span>Svelte</span><span></span></div>
+        <div class="bench-bar-wrap"><div class="bench-bar" style="width:90%;background:#ff6b35"></div></div>
+      </div>
+      <div class="bench">
+        <div class="bench-label"><span>Vue</span><span></span></div>
+        <div class="bench-bar-wrap"><div class="bench-bar" style="width:72%;background:#42d392"></div></div>
+      </div>
+      <div class="bench">
+        <div class="bench-label"><span>React</span><span></span></div>
+        <div class="bench-bar-wrap"><div class="bench-bar" style="width:58%;background:var(--react-color)"></div></div>
+      </div>
+      <p style="font-size:.65em;color:#888;margin-top:.3em">js-framework-benchmark (менше часу = краще)</p>
+    </div>
+    <div>
+      <ul>
+        <li>Runtime <strong>~7 KB</strong> gzip (React ~45 KB)</li>
+        <li>JSX-синтаксис — звичний React-розробнику</li>
+        <li>Без Virtual DOM — пряме оновлення DOM</li>
+        <li>TypeScript із коробки</li>
+        <li>SolidStart — аналог Next.js</li>
+        <li>Literotica використовує ✓</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     DIVIDER — REACTIVITY
+══════════════════════════════════════════════ -->
+<section class="section-divider" data-background="linear-gradient(135deg,#0d1b2e 0%,#1a3a5a 100%)">
+  <h2>⚡ Як працює реактивність</h2>
+  <p>Fine-grained reactivity — серце Solid.js</p>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 3 — REACT vs SOLID MODEL
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Дві моделі реактивності</h2>
+  <div class="cols">
+    <div class="box orange">
+      <h3 style="color:var(--react-color)">React — Pull</h3>
+      <ol style="font-size:.8em;padding-left:1.2em;list-style:decimal">
+        <li>setState()</li>
+        <li>React перезапускає render()</li>
+        <li>Будує новий Virtual DOM</li>
+        <li>Порівнює з попереднім (diffing)</li>
+        <li>Патчить реальний DOM</li>
+      </ol>
+      <p style="font-size:.72em;color:#aaa;margin-top:.6em">Компонент — функція, яка викликається знову і знову</p>
+    </div>
+    <div class="box blue">
+      <h3 style="color:var(--solid-accent)">Solid — Push</h3>
+      <ol style="font-size:.8em;padding-left:1.2em;list-style:decimal">
+        <li>setSignal()</li>
+        <li>Solid знаходить підписників</li>
+        <li>Оновлює тільки їх</li>
+        <li>DOM патчиться напряму</li>
+      </ol>
+      <p style="font-size:.72em;color:#aaa;margin-top:.6em">Компонент — фабрика, що запускається <strong>один раз</strong></p>
+    </div>
+  </div>
+  <div class="box green" style="margin-top:.8em;font-size:.8em">
+    💡 Уявіть Excel: формула <code>=A1*2</code> у клітинці B1 — B1 «підписана» на A1.
+    Змінили A1 → B1 перерахувалась автоматично. Solid робить те саме для DOM.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 4 — REACTIVE GRAPH
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Реактивний граф</h2>
+  <p style="font-size:.8em">Кожна стрілка — підписка. Оновлення йде тільки по підписках.</p>
+  <div class="graph-wrap">
+    <svg width="720" height="320" viewBox="0 0 720 320">
+      <!-- Signal -->
+      <rect x="270" y="20" width="180" height="50" rx="10" fill="#2c4f7c" stroke="#76b3e1" stroke-width="2"/>
+      <text x="360" y="51" text-anchor="middle" fill="#76b3e1" font-size="16" font-weight="bold">Signal(count)</text>
+
+      <!-- arrows from signal -->
+      <line x1="310" y1="70" x2="130" y2="140" stroke="#76b3e1" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="360" y1="70" x2="360" y2="140" stroke="#76b3e1" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="410" y1="70" x2="590" y2="140" stroke="#76b3e1" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Effect -->
+      <rect x="20" y="140" width="210" height="50" rx="10" fill="#1a3a1a" stroke="#4ade80" stroke-width="2"/>
+      <text x="125" y="171" text-anchor="middle" fill="#4ade80" font-size="14">Effect(console.log)</text>
+
+      <!-- Memo -->
+      <rect x="255" y="140" width="210" height="50" rx="10" fill="#3a2a00" stroke="#fb923c" stroke-width="2"/>
+      <text x="360" y="162" text-anchor="middle" fill="#fb923c" font-size="14">Memo</text>
+      <text x="360" y="182" text-anchor="middle" fill="#fb923c" font-size="12">doubled = count × 2</text>
+
+      <!-- DOM 1 from signal -->
+      <rect x="490" y="140" width="210" height="50" rx="10" fill="#1a1a3a" stroke="#a78bfa" stroke-width="2"/>
+      <text x="595" y="162" text-anchor="middle" fill="#a78bfa" font-size="13">&lt;p&gt;{count()}&lt;/p&gt;</text>
+      <text x="595" y="180" text-anchor="middle" fill="#888" font-size="11">DOM вузол</text>
+
+      <!-- arrow from Memo to DOM2 -->
+      <line x1="360" y1="190" x2="360" y2="250" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+      <!-- DOM 2 from Memo -->
+      <rect x="255" y="250" width="210" height="50" rx="10" fill="#1a1a3a" stroke="#a78bfa" stroke-width="2"/>
+      <text x="360" y="272" text-anchor="middle" fill="#a78bfa" font-size="13">&lt;span&gt;{doubled()}&lt;/span&gt;</text>
+      <text x="360" y="290" text-anchor="middle" fill="#888" font-size="11">DOM вузол</text>
+
+      <!-- arrowhead markers -->
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#76b3e1"/>
+        </marker>
+        <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#fb923c"/>
+        </marker>
+      </defs>
+
+      <!-- legend -->
+      <rect x="20" y="270" width="14" height="14" rx="2" fill="#2c4f7c" stroke="#76b3e1"/>
+      <text x="40" y="282" fill="#aaa" font-size="12">Signal</text>
+      <rect x="100" y="270" width="14" height="14" rx="2" fill="#1a3a1a" stroke="#4ade80"/>
+      <text x="120" y="282" fill="#aaa" font-size="12">Effect</text>
+      <rect x="180" y="270" width="14" height="14" rx="2" fill="#3a2a00" stroke="#fb923c"/>
+      <text x="200" y="282" fill="#aaa" font-size="12">Memo</text>
+      <rect x="250" y="270" width="14" height="14" rx="2" fill="#1a1a3a" stroke="#a78bfa"/>
+      <text x="270" y="282" fill="#aaa" font-size="12">DOM</text>
+    </svg>
+  </div>
+  <p style="font-size:.75em;color:#aaa;text-align:center">
+    Змінився <code>count</code> → оновились тільки підписані вузли. Решта DOM не чіпається.
+  </p>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 5 — HOW TRACKING WORKS (internals)
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Як Solid відстежує залежності</h2>
+  <p style="font-size:.8em">Спрощена реалізація під капотом — жодної магії</p>
+  <pre><code class="language-js">// Глобальна змінна — «поточний спостерігач»
+let currentObserver = null;
+
+function createSignal(value) {
+  const subscribers = new Set();
+
+  const read = () => {
+    if (currentObserver) {
+      subscribers.add(currentObserver); // ← реєструємо підписника
+    }
+    return value;
+  };
+
+  const write = (newValue) => {
+    value = newValue;
+    subscribers.forEach(sub => sub()); // ← повідомляємо всіх
+  };
+
+  return [read, write];
+}
+
+function createEffect(fn) {
+  const effect = () => {
+    currentObserver = effect; // ← «слухаємо»
+    fn();                     // ← усі count() всередині підпишуться
+    currentObserver = null;   // ← прибираємо слухача
+  };
+  effect(); // перший запуск
+}</code></pre>
+  <div class="box blue" style="font-size:.75em;margin-top:.5em">
+    💡 <code>count()</code> — це не просто читання значення.
+    Це реєстрація залежності у поточному контексті.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 6 — createSignal
+══════════════════════════════════════════════ -->
+<section>
+  <h2>createSignal — деталі</h2>
+  <pre><code class="language-tsx">const [count, setCount] = createSignal(0);
+
+// Читання — завжди функція
+count()   // ✅ 0
+count     // ❌ [Function] — не значення!
+
+// Setter — два варіанти
+setCount(5);                    // нове значення напряму
+setCount(prev => prev + 1);    // updater-функція
+
+// Нюанс: рівність
+setCount(5);
+setCount(5); // ефект НЕ спрацює — 5 === 5, нічого не змінилось
+
+// Для об'єктів — посилання різні → завжди тригер
+const [obj, setObj] = createSignal({ x: 1 });
+setObj({ x: 1 }); // тригерить! {} !== {}
+
+// Вимкнути порівняння:
+createSignal(0, { equals: false }); // завжди тригерить</code></pre>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 7 — createMemo
+══════════════════════════════════════════════ -->
+<section>
+  <h2>createMemo — обчислюваний стан</h2>
+  <pre><code class="language-tsx">const [firstName, setFirstName] = createSignal('Dmytro');
+const [lastName, setLastName]   = createSignal('Kovalenko');
+
+// ✅ createMemo — кешується, без масиву залежностей
+const fullName = createMemo(() => `${firstName()} ${lastName()}`);
+fullName() // 'Dmytro Kovalenko'
+
+// Перераховується тільки при зміні firstName або lastName
+// Якщо залежності не змінились — повертає кеш</code></pre>
+
+  <div class="cols" style="margin-top:.6em">
+    <div class="box green">
+      <p style="font-size:.78em"><span class="tag ok">createMemo</span> потрібен коли:</p>
+      <ul style="font-size:.75em">
+        <li>Обчислення дороге</li>
+        <li>Результат читається у кількох місцях</li>
+        <li>Хочемо уникнути повторних розрахунків</li>
+      </ul>
+    </div>
+    <div class="box orange">
+      <p style="font-size:.78em"><span class="tag tip">Проста функція</span> підійде якщо:</p>
+      <pre style="margin:0"><code class="language-tsx" style="font-size:.75em">// Теж реактивно в JSX!
+const fullName = () =>
+  `${firstName()} ${lastName()}`;
+
+// &lt;p&gt;{fullName()}&lt;/p&gt; — ✅ працює</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 8 — createEffect
+══════════════════════════════════════════════ -->
+<section>
+  <h2>createEffect — нюанси</h2>
+  <div class="cols">
+    <div>
+      <p style="font-size:.8em"><span class="tag ok">Cleanup</span></p>
+      <pre><code class="language-tsx">createEffect(() => {
+  const timer = setInterval(
+    () => console.log(count()),
+    1000
+  );
+  // Викликається перед кожним
+  // перезапуском і при знищенні
+  onCleanup(() => clearInterval(timer));
+});</code></pre>
+    </div>
+    <div>
+      <p style="font-size:.8em"><span class="tag bad">Нескінченний цикл</span></p>
+      <pre><code class="language-tsx">// ❌ НЕ РОБІТЬ ТАК
+createEffect(() => {
+  setCount(count() + 1); // 💥 loop!
+});
+
+// ✅ Для похідного стану
+const nextCount = createMemo(
+  () => count() + 1
+);</code></pre>
+    </div>
+  </div>
+  <div class="box red" style="margin-top:.6em">
+    <p style="font-size:.8em"><span class="tag bad">async пастка</span> — після <code>await</code> відстеження зупиняється!</p>
+    <pre><code class="language-tsx">// ❌ userId після await — НЕ відстежується
+createEffect(async () => {
+  const data = await fetch(`/api/${userId()}`); // ← після await!
+});
+
+// ✅ Читаємо сигнал ДО await
+createEffect(() => {
+  const id = userId(); // ← тут відстежується
+  void (async () => {
+    const data = await fetch(`/api/${id}`);
+    setUser(await data.json());
+  })();
+});</code></pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 9 — EXECUTION CONTEXT
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Де сигнали відстежуються?</h2>
+  <div class="cols">
+    <div class="box green">
+      <p style="font-size:.82em;font-weight:700;color:var(--ok)">✅ Реактивний контекст</p>
+      <ul style="font-size:.78em">
+        <li><code>createEffect(() => { ... })</code></li>
+        <li><code>createMemo(() => { ... })</code></li>
+        <li>JSX: <code>&lt;p&gt;{"{count()}"}&lt;/p&gt;</code></li>
+        <li>Тіло компонента (перший рендер)</li>
+      </ul>
+    </div>
+    <div class="box red">
+      <p style="font-size:.82em;font-weight:700;color:var(--err)">❌ НЕ реактивний контекст</p>
+      <ul style="font-size:.78em">
+        <li><code>setTimeout</code> / <code>setInterval</code></li>
+        <li><code>addEventListener</code> callbacks</li>
+        <li>Після першого <code>await</code></li>
+        <li>Звичайні функції поза контекстом</li>
+      </ul>
+    </div>
+  </div>
+  <pre style="margin-top:.6em"><code class="language-tsx">// ❌ Читання без підписки
+function logCount() {
+  console.log(count()); // виведе один раз і забуде
+}
+setTimeout(logCount, 1000);
+
+// ✅ Читаємо в ефекті, ДО setTimeout
+createEffect(() => {
+  const current = count(); // підписка є
+  setTimeout(() => console.log(current), 1000);
+});</code></pre>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 10 — PROPS DESTRUCTURING
+══════════════════════════════════════════════ -->
+<section>
+  <h2>⚠ Пастка №1 — деструктуризація props</h2>
+  <pre><code class="language-tsx">// ❌ НІКОЛИ ТАК — реактивність зникає!
+const MyComponent = ({ name, age }) => {
+  // name і age — звичайні значення, знімок при першому рендері
+  return &lt;p&gt;{name} is {age}&lt;/p&gt;;
+};
+// Змінили name зовні — компонент не оновиться</code></pre>
+
+  <div class="cols" style="margin-top:.5em">
+    <div>
+      <p style="font-size:.78em"><span class="tag ok">Варіант 1</span> — читати через props</p>
+      <pre><code class="language-tsx">const MyComponent = (props) => {
+  return (
+    &lt;p&gt;{props.name} is {props.age}&lt;/p&gt;
+  );
+};</code></pre>
+    </div>
+    <div>
+      <p style="font-size:.78em"><span class="tag ok">Варіант 2</span> — splitProps</p>
+      <pre><code class="language-tsx">const MyComponent = (props) => {
+  const [local, rest] = splitProps(
+    props, ['name', 'age']
+  );
+  // local.name — геттер, не примітив
+  return &lt;p&gt;{local.name} is {local.age}&lt;/p&gt;;
+};</code></pre>
+    </div>
+  </div>
+  <div class="box blue" style="margin-top:.5em;font-size:.78em">
+    💡 <code>props</code> у Solid — це Proxy з геттерами. Деструктуризація читає значення один раз і зберігає примітив. Реактивність губиться.
+    <br>Для дефолтних значень: <code>mergeProps(&#123; age: 18 &#125;, props)</code>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 11 — createStore
+══════════════════════════════════════════════ -->
+<section>
+  <h2>createStore — складний стан</h2>
+  <pre><code class="language-tsx">const [state, setState] = createStore({
+  user: { name: 'Dmytro', address: { city: 'Kyiv' } },
+  items: [1, 2, 3],
+});
+
+// Читання — як звичайний об'єкт (але реактивно)
+state.user.name          // 'Dmytro'
+state.user.address.city  // 'Kyiv'
+
+// Запис через шлях
+setState('user', 'name', 'Ivan');
+setState('user', 'address', 'city', 'Lviv');
+
+// Масиви
+setState('items', items => [...items, 4]);
+setState('items', 1, 99); // items[1] = 99</code></pre>
+  <div class="cols" style="margin-top:.5em">
+    <div class="box green" style="font-size:.78em">
+      <strong>Гранулярність:</strong> кожне поле — окремий реактивний вузол.
+      Компонент, що читає <code>state.user.name</code>,
+      не оновиться при зміні <code>state.user.address.city</code>.
+    </div>
+    <div class="box red" style="font-size:.78em">
+      <strong>Та сама пастка:</strong>
+      <pre style="margin:.3em 0"><code class="language-tsx">// ❌
+const { name } = state.user; // рядок!
+
+// ✅
+state.user.name // геттер, реактивно</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 12 — batch & untrack
+══════════════════════════════════════════════ -->
+<section>
+  <h2>batch та untrack</h2>
+  <div class="cols">
+    <div>
+      <h3>batch — групування оновлень</h3>
+      <pre><code class="language-tsx">const [a, setA] = createSignal(1);
+const [b, setB] = createSignal(2);
+
+createEffect(() => console.log(a() + b()));
+
+// Без batch — ефект спрацює ДВІЧІ
+setA(10);
+setB(20);
+
+// З batch — ефект спрацює ОДИН РАЗ
+batch(() => {
+  setA(10);
+  setB(20);
+});</code></pre>
+      <p style="font-size:.72em;color:#aaa">У обробниках DOM-подій Solid батчить автоматично. batch потрібен в async-коді.</p>
+    </div>
+    <div>
+      <h3>untrack — читання без підписки</h3>
+      <pre><code class="language-tsx">const [a, setA] = createSignal(1);
+const [b, setB] = createSignal(2);
+
+createEffect(() => {
+  // Ефект реагує на a()
+  // але НЕ реагує на b()
+  console.log(a() + untrack(b));
+});</code></pre>
+      <div class="box blue" style="font-size:.75em;margin-top:.5em">
+        Корисно коли <code>b</code> — допоміжне значення,
+        яке не повинно тригерити перерахунок.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 13 — onMount / onCleanup
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Lifecycle: onMount / onCleanup</h2>
+  <pre><code class="language-tsx">const ChartComponent = () => {
+  let canvasRef: HTMLCanvasElement | undefined;
+  let chartInstance: Chart | undefined;
+
+  onMount(() => {
+    // Виконується після вставки у DOM (аналог useEffect(fn, []))
+    // ⚠ НЕ запускається на сервері (SSR)
+    chartInstance = new Chart(canvasRef!, { ... });
+  });
+
+  onCleanup(() => {
+    // Виконується при знищенні компонента
+    // Аналог return () => { ... } у useEffect
+    chartInstance?.destroy();
+  });
+
+  return &lt;canvas ref={canvasRef} /&gt;;
+};</code></pre>
+  <div class="box blue" style="font-size:.8em;margin-top:.6em">
+    <code>onCleanup</code> можна також викликати всередині <code>createEffect</code> —
+    там він прибирає підписки перед кожним перезапуском ефекту.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     DIVIDER — PRIMITIVES
+══════════════════════════════════════════════ -->
+<section class="section-divider" data-background="linear-gradient(135deg,#0d1b2e 0%,#1a3a5a 100%)">
+  <h2>🧱 Ключові примітиви</h2>
+  <p>Show · For · Index · createResource</p>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 14 — Show / For / Index
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Show, For, Index — чому не if/.map()</h2>
+  <div class="cols">
+    <div>
+      <p style="font-size:.8em"><span class="tag ok">Show</span> — умовний рендер</p>
+      <pre><code class="language-tsx">// ✅ Show — оптимізований
+&lt;Show when={isLoggedIn()} fallback={&lt;Login /&gt;}&gt;
+  &lt;Dashboard /&gt;
+&lt;/Show&gt;
+
+// ⚠ Тернарний оператор — теж працює,
+// але Solid не оптимізує так само
+{isLoggedIn() ? &lt;Dashboard /&gt; : &lt;Login /&gt;}</code></pre>
+    </div>
+    <div>
+      <p style="font-size:.8em"><span class="tag ok">For</span> — реактивний список</p>
+      <pre><code class="language-tsx">// ✅ For — key-diffing, не перебудовує все
+&lt;For each={items()}&gt;
+  {(item, index) =&gt; (
+    &lt;li&gt;{index()} — {item.name}&lt;/li&gt;
+    // index — теж сигнал-функція!
+  )}
+&lt;/For&gt;
+
+// ❌ .map() — не реактивний,
+// перебудовує весь список
+{items().map(i =&gt; &lt;li&gt;{i.name}&lt;/li&gt;)}</code></pre>
+    </div>
+  </div>
+  <div class="box orange" style="margin-top:.5em;font-size:.78em">
+    <strong>Index</strong> (альтернатива For) — стабілізує за індексом, а не за елементом.
+    Підходить для примітивних масивів (числа, рядки).
+    <pre style="margin:.3em 0"><code class="language-tsx">&lt;Index each={numbers()}&gt;
+  {(number, i) =&gt; &lt;span&gt;{number()}&lt;/span&gt;}
+  {/* number — сигнал, i — звичайне число */}
+&lt;/Index&gt;</code></pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 15 — createResource
+══════════════════════════════════════════════ -->
+<section>
+  <h2>createResource — async дані</h2>
+  <pre><code class="language-tsx">// Базовий варіант
+const [posts] = createResource(fetchPosts);
+
+// З динамічним параметром
+// Перезапускається при зміні userId()
+const [user] = createResource(userId, (id) => fetchUser(id));
+
+// Якщо source повертає false/undefined — fetch не викликається
+const [post] = createResource(
+  () => props.id || false,
+  (id) => fetchPost(id)
+);
+
+// Стани
+user()          // значення або undefined
+user.loading    // boolean
+user.error      // помилка або undefined
+user.state      // 'unresolved'|'pending'|'ready'|'refreshing'|'errored'
+
+// Примусове оновлення
+const [data, { refetch, mutate }] = createResource(fetchPosts);
+refetch();           // повторний fetch
+mutate(newValue);    // оновити локально без fetch</code></pre>
+  <pre style="margin-top:.5em"><code class="language-tsx">// Разом із Suspense
+&lt;Suspense fallback={&lt;Spinner /&gt;}&gt;
+  &lt;p&gt;{user()?.name}&lt;/p&gt;
+&lt;/Suspense&gt;</code></pre>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     DIVIDER — SOLIDSTART
+══════════════════════════════════════════════ -->
+<section class="section-divider" data-background="linear-gradient(135deg,#0d1b2e 0%,#1a3a5a 100%)">
+  <h2>🚀 SolidStart</h2>
+  <p>Мета-фреймворк: SSR · Routing · Server Functions</p>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 16 — SolidStart overview
+══════════════════════════════════════════════ -->
+<section>
+  <h2>SolidStart — що всередині</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li>File-based routing</li>
+        <li>SSR / CSR / Static / Streaming</li>
+        <li>Server Functions (RPC)</li>
+        <li>API Routes</li>
+        <li>Middleware</li>
+      </ul>
+      <div class="box blue" style="font-size:.78em;margin-top:.8em">
+        Під капотом:<br>
+        <strong>Vinxi</strong> (bundler) + <strong>Nitro</strong> (server)
+      </div>
+    </div>
+    <div>
+      <p style="font-size:.82em;color:var(--solid-accent)">Файлова структура</p>
+      <pre><code class="language-text">src/
+  routes/
+    index.tsx        →  "/"
+    about.tsx        →  "/about"
+    blog/
+      [slug].tsx     →  "/blog/:slug"
+    (auth)/
+      login.tsx      →  "/login"
+  app.tsx            →  root layout</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 17 — Server Functions
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Server Functions</h2>
+  <pre><code class="language-tsx">// query — читання (GET-семантика, кешується)
+const getUser = query(async (id: string) => {
+  'use server';
+  return await db.users.findById(id);
+}, 'getUser');
+
+// action — мутації (POST-семантика)
+const createPost = action(async (formData: FormData) => {
+  'use server';
+  const title = formData.get('title') as string;
+  return await db.posts.create({ title });
+});
+
+// Використання у компоненті
+const MyPage = () => {
+  const user = createAsync(() => getUser(params.id));
+
+  return (
+    &lt;form action={createPost} method="post"&gt;
+      &lt;input name="title" /&gt;
+      &lt;button type="submit"&gt;Створити&lt;/button&gt;
+    &lt;/form&gt;
+  );
+};</code></pre>
+  <div class="box blue" style="font-size:.78em;margin-top:.5em">
+    Server functions виконуються на сервері, але викликаються як звичайні функції у клієнтському коді.
+    Solid автоматично генерує RPC-шар.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 18 — Rendering modes & Deploy
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Режими рендерингу та деплой</h2>
+  <div class="cols">
+    <div>
+      <h3>Режими</h3>
+      <pre><code class="language-tsx">// SSR (за замовчуванням)
+// — нічого не треба
+
+// CSR (тільки клієнт)
+export const config = { ssr: false };
+
+// Static pre-rendering
+export const config = {
+  prerender: true
+};
+
+// Streaming SSR — просто Suspense
+&lt;Suspense fallback={&lt;Skeleton /&gt;}&gt;
+  &lt;HeavyComponent /&gt;
+&lt;/Suspense&gt;</code></pre>
+    </div>
+    <div>
+      <h3>Деплой (завдяки Nitro)</h3>
+      <ul>
+        <li>Node.js</li>
+        <li>Cloudflare Workers</li>
+        <li>Vercel / Netlify Edge</li>
+        <li>Deno Deploy</li>
+        <li>Bun</li>
+      </ul>
+      <div class="box green" style="font-size:.78em;margin-top:.6em">
+        Один і той самий код — будь-яка платформа. Змінюється тільки адаптер у конфіґу.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 19 — COMPARISON TABLE
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Solid vs React</h2>
+  <table>
+    <thead>
+      <tr><th>Ознака</th><th style="color:var(--react-color)">React</th><th style="color:var(--solid-accent)">Solid</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Реактивність</td><td>Virtual DOM</td><td>Fine-grained</td></tr>
+      <tr><td>Re-renders</td><td>Компонент цілком</td><td>Тільки залежності</td></tr>
+      <tr><td>Масив залежностей</td><td class="yes">Потрібен</td><td class="no">Не потрібен</td></tr>
+      <tr><td>JSX</td><td class="yes">Так</td><td class="yes">Так</td></tr>
+      <tr><td>TypeScript</td><td class="yes">Так</td><td class="yes">Так</td></tr>
+      <tr><td>SSR фреймворк</td><td>Next.js</td><td>SolidStart</td></tr>
+      <tr><td>Runtime розмір</td><td>~45 KB</td><td>~7 KB</td></tr>
+      <tr><td>Async дані</td><td>React Query</td><td>createResource</td></tr>
+      <tr><td>Глобальний стан</td><td>Zustand / Redux</td><td>createStore</td></tr>
+      <tr><td>Lifecycle</td><td>useEffect(fn,[])</td><td>onMount / onCleanup</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 20 — PITFALLS SUMMARY
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Зведення підводних каменів</h2>
+  <div class="pitfall"><span class="icon">⚠️</span><div><code>count</code> — функція, не значення. <strong>Ніколи не деструктуруйте props!</strong></div></div>
+  <div class="pitfall"><span class="icon">⚠️</span><div>Компонент рендериться <strong>один раз</strong>. Логіка в тілі виконується тільки при ініціалізації.</div></div>
+  <div class="pitfall"><span class="icon">⚠️</span><div>Читання сигналу поза реактивним контекстом — <strong>підписки немає</strong>.</div></div>
+  <div class="pitfall"><span class="icon">⚠️</span><div>Після <code>await</code> у <code>createEffect</code> — відстеження залежностей <strong>зупиняється</strong>.</div></div>
+  <div class="pitfall"><span class="icon">⚠️</span><div><code>setSignal</code> всередині <code>createEffect</code> на той самий сигнал → <strong>нескінченний цикл</strong>.</div></div>
+  <div class="pitfall"><span class="icon">⚠️</span><div>Масиви у <code>createStore</code> — не мутуйте напряму, використовуйте <code>setState</code>.</div></div>
+  <div class="pitfall"><span class="icon">⚠️</span><div><code>&lt;For&gt;</code>, а не <code>.map()</code> — інакше втрачаєте key-diffing.</div></div>
+  <div class="pitfall"><span class="icon">⚠️</span><div>JSX компілюється інакше — не вставляйте Solid-компоненти у React-проєкт.</div></div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 21 — WHEN TO CHOOSE SOLID
+══════════════════════════════════════════════ -->
+<section>
+  <h2>Коли обирати Solid?</h2>
+  <div class="cols">
+    <div class="box green">
+      <p style="font-weight:700;color:var(--ok)">✅ Підходить</p>
+      <ul>
+        <li>Новий проєкт без legacy-коду</li>
+        <li>Важлива продуктивність</li>
+        <li>Real-time / дашборди</li>
+        <li>Мобільний веб з обмеженим трафіком</li>
+        <li>Команда готова вивчити новий API</li>
+      </ul>
+    </div>
+    <div class="box red">
+      <p style="font-weight:700;color:var(--err)">❌ Не підходить</p>
+      <ul>
+        <li>Критична велика екосистема React-бібліотек</li>
+        <li>Команда тільки починає з фронтенду</li>
+        <li>Великий legacy React-проєкт</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box blue" style="margin-top:.8em">
+    <h3 style="margin:0 0 .3em">Корисні посилання</h3>
+    <ul style="font-size:.8em">
+      <li><code>docs.solidjs.com</code> — документація</li>
+      <li><code>start.solidjs.com</code> — SolidStart</li>
+      <li><code>playground.solidjs.com</code> — онлайн playground</li>
+      <li><code>discord.com/invite/solidjs</code> — спільнота</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 22 — THANK YOU
+══════════════════════════════════════════════ -->
+<section class="center-slide" data-background="linear-gradient(135deg,#0d1b2e 0%,#1a2a4a 100%)">
+  <div style="font-size:4em">⬡</div>
+  <h1 style="font-size:1.8em">Дякую!</h1>
+  <p class="subtitle">Питання?</p>
+  <div style="margin-top:2em;font-size:.8em;color:#aaa">
+    <p>Solid.js — це не React-замінник.<br>Це інша модель мислення про реактивність.</p>
+  </div>
+</section>
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'slide',
+    transitionSpeed: 'fast',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1200,
+    height: 700,
+    margin: 0.04,
+    plugins: [ RevealHighlight, RevealNotes ],
+    highlight: {
+      highlightOnLoad: true,
+    }
+  });
+</script>
+</body>
+</html>
